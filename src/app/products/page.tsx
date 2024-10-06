@@ -1,23 +1,43 @@
 "use client";
 
-import { useCreateProductMutation, useGetProductsQuery } from "@/state/api";
-import { PlusCircleIcon, SearchIcon } from "lucide-react";
+import {
+  useCreateProductMutation,
+  useDeleteProductMutation,
+  useGetProductsQuery,
+} from "@/state/api";
+import {
+  PlusCircleIcon,
+  SearchIcon,
+  Edit2Icon,
+  Trash2Icon,
+} from "lucide-react";
 import { useState } from "react";
 import Header from "@/app/(components)/Header";
 import Rating from "@/app/(components)/Rating";
 import CreateProductModal from "./CreateProductModal";
-/* import Image from "next/image"; */
+import UpdateProductModal from "./UpdateProductModal";
+import ProductDetailsModal from "./ProductDetailsModal";
 
 type ProductFormData = {
+  productId?: string;
   name: string;
   price: number;
   stockQuantity: number;
   rating: number;
+  // slug
+  // description
+  // size
+  // gender
 };
 
 const Products = () => {
   const [searchTerm, setSearchTerm] = useState("");
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
+  const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
+  const [selectedProductId, setSelectedProductId] = useState<string | null>(
+    null
+  );
 
   const {
     data: products,
@@ -26,8 +46,14 @@ const Products = () => {
   } = useGetProductsQuery(searchTerm);
 
   const [createProduct] = useCreateProductMutation();
+  const [deleteProduct] = useDeleteProductMutation();
+
   const handleCreateProduct = async (productData: ProductFormData) => {
     await createProduct(productData);
+  };
+
+  const handleDeleteProduct = async (productId: string) => {
+    await deleteProduct(productId);
   };
 
   if (isLoading) {
@@ -62,7 +88,7 @@ const Products = () => {
         <Header name="Products" />
         <button
           className="flex items-center bg-blue-500 hover:bg-blue-700 text-gray-200 font-bold py-2 px-4 rounded"
-          onClick={() => setIsModalOpen(true)}
+          onClick={() => setIsCreateModalOpen(true)}
         >
           <PlusCircleIcon className="w-5 h-5 mr-2 !text-gray-200" /> Create
           Product
@@ -70,18 +96,89 @@ const Products = () => {
       </div>
 
       {/* BODY PRODUCTS LIST */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg-grid-cols-3 gap-10 justify-between">
-        {isLoading ? (
-          <div>Loading...</div>
-        ) : (
-          products?.map((product) => (
-            <div
-              key={product.productId}
-              className="border shadow rounded-md p-4 max-w-full w-full mx-auto"
-            >
-              <div className="flex flex-col items-center">
-                <div>img</div>
-                {/* <Image
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10 justify-between">
+        {products.map((product) => (
+          <div
+            key={product.productId}
+            className="border shadow rounded-md p-4 max-w-full w-full mx-auto"
+          >
+            <div className="flex flex-col items-center">
+              {/* Placeholder para la imagen */}
+              <div>img</div>
+              <h3 className="text-lg text-gray-900 font-semibold">
+                {product.name}
+              </h3>
+              <p className="text-gray-800">${product.price.toFixed(2)}</p>
+              <div className="text-sm text-gray-600 mt-1">
+                Stock: {product.stockQuantity}
+              </div>
+              {product.rating && (
+                <div className="flex items-center mt-2">
+                  <Rating rating={product.rating} />
+                </div>
+              )}
+              {/* Botones de acciones */}
+              <div className="flex mt-4 space-x-2">
+                <button
+                  onClick={() => {
+                    setSelectedProductId(product.productId);
+                    setIsDetailsModalOpen(true);
+                  }}
+                  className="px-2 py-1 bg-green-500 text-white rounded hover:bg-green-700"
+                >
+                  View
+                </button>
+                <button
+                  onClick={() => {
+                    setSelectedProductId(product.productId);
+                    setIsUpdateModalOpen(true);
+                  }}
+                  className="px-2 py-1 bg-yellow-500 text-white rounded hover:bg-yellow-700"
+                >
+                  <Edit2Icon className="w-4 h-4" />
+                </button>
+                <button
+                  onClick={() => handleDeleteProduct(product.productId)}
+                  className="px-2 py-1 bg-red-500 text-white rounded hover:bg-red-700"
+                >
+                  <Trash2Icon className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* MODALES */}
+      <CreateProductModal
+        isOpen={isCreateModalOpen}
+        onClose={() => setIsCreateModalOpen(false)}
+        onCreate={handleCreateProduct}
+      />
+
+      {selectedProductId && (
+        <UpdateProductModal
+          isOpen={isUpdateModalOpen}
+          onClose={() => setIsUpdateModalOpen(false)}
+          productId={selectedProductId}
+        />
+      )}
+
+      {selectedProductId && (
+        <ProductDetailsModal
+          isOpen={isDetailsModalOpen}
+          onClose={() => setIsDetailsModalOpen(false)}
+          productId={selectedProductId}
+        />
+      )}
+    </div>
+  );
+};
+
+export default Products;
+
+{
+  /* <Image
                   src={`https://s3-inventorymanagement.s3.us-east-2.amazonaws.com/product${
                     Math.floor(Math.random() * 3) + 1
                   }.png`}
@@ -89,33 +186,5 @@ const Products = () => {
                   width={150}
                   height={150}
                   className="mb-3 rounded-2xl w-36 h-36"
-                /> */}
-                <h3 className="text-lg text-gray-900 font-semibold">
-                  {product.name}
-                </h3>
-                <p className="text-gray-800">${product.price.toFixed(2)}</p>
-                <div className="text-sm text-gray-600 mt-1">
-                  Stock: {product.stockQuantity}
-                </div>
-                {product.rating && (
-                  <div className="flex items-center mt-2">
-                    <Rating rating={product.rating} />
-                  </div>
-                )}
-              </div>
-            </div>
-          ))
-        )}
-      </div>
-
-      {/* MODAL */}
-      <CreateProductModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        onCreate={handleCreateProduct}
-      />
-    </div>
-  );
-};
-
-export default Products;
+                /> */
+}

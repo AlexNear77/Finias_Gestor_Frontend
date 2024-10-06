@@ -1,5 +1,6 @@
-import React, { ChangeEvent, FormEvent, useState } from "react";
-import { v4 } from "uuid";
+// UpdateProductModal.tsx
+import React, { ChangeEvent, FormEvent, useEffect, useState } from "react";
+import { useGetProductByIdQuery, useUpdateProductMutation } from "@/state/api";
 import Header from "@/app/(components)/Header";
 
 type ProductFormData = {
@@ -9,24 +10,36 @@ type ProductFormData = {
   rating: number;
 };
 
-type CreateProductModalProps = {
+type UpdateProductModalProps = {
   isOpen: boolean;
   onClose: () => void;
-  onCreate: (formData: ProductFormData) => void;
+  productId: string;
 };
 
-const CreateProductModal = ({
+const UpdateProductModal = ({
   isOpen,
   onClose,
-  onCreate,
-}: CreateProductModalProps) => {
-  const [formData, setFormData] = useState({
-    productId: v4(),
+  productId,
+}: UpdateProductModalProps) => {
+  const { data: product, isLoading } = useGetProductByIdQuery(productId);
+  const [updateProduct] = useUpdateProductMutation();
+  const [formData, setFormData] = useState<ProductFormData>({
     name: "",
     price: 0,
     stockQuantity: 0,
     rating: 0,
   });
+
+  useEffect(() => {
+    if (product) {
+      setFormData({
+        name: product.name,
+        price: product.price,
+        stockQuantity: product.stockQuantity,
+        rating: product.rating || 0,
+      });
+    }
+  }, [product]);
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -39,21 +52,21 @@ const CreateProductModal = ({
     });
   };
 
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    onCreate(formData);
+    await updateProduct({ productId, ...formData });
     onClose();
-    // Restablecer el formulario
-    setFormData({
-      productId: "",
-      name: "",
-      price: 0,
-      stockQuantity: 0,
-      rating: 0,
-    });
   };
 
   if (!isOpen) return null;
+
+  if (isLoading) {
+    return (
+      <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-20">
+        <div className="bg-white p-4 rounded">Loading...</div>
+      </div>
+    );
+  }
 
   const labelCssStyles = "block text-sm font-medium text-gray-700";
   const inputCssStyles =
@@ -62,7 +75,7 @@ const CreateProductModal = ({
   return (
     <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-20">
       <div className="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
-        <Header name="Create New Product" />
+        <Header name="Update Product" />
         <form onSubmit={handleSubmit} className="mt-5">
           {/* PRODUCT NAME */}
           <label htmlFor="productName" className={labelCssStyles}>
@@ -119,12 +132,12 @@ const CreateProductModal = ({
             className={inputCssStyles}
           />
 
-          {/* CREATE ACTIONS */}
+          {/* UPDATE ACTIONS */}
           <button
             type="submit"
             className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700"
           >
-            Create
+            Update
           </button>
           <button
             onClick={onClose}
@@ -139,4 +152,4 @@ const CreateProductModal = ({
   );
 };
 
-export default CreateProductModal;
+export default UpdateProductModal;

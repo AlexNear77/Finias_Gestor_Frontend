@@ -16,6 +16,14 @@ export interface NewProduct {
   stockQuantity: number;
 }
 
+export interface UpdateProduct {
+  productId: string;
+  name?: string;
+  price?: number;
+  rating?: number;
+  stockQuantity?: number;
+}
+
 export interface SalesSummary {
   salesSummaryId: string;
   totalValue: number;
@@ -67,12 +75,24 @@ export const api = createApi({
       providesTags: ["DashboardMetrics"],
     }),
     getProducts: build.query<Product[], string | void>({
-      // se usa para buscar productos si no se mandan parametros se obtienen todos los productos
       query: (search) => ({
         url: "/products",
         params: search ? { search } : {},
       }),
-      providesTags: ["Products"],
+      providesTags: (result) =>
+        result
+          ? [
+              ...result.map(
+                ({ productId }) =>
+                  ({ type: "Products", id: productId } as const)
+              ),
+              { type: "Products", id: "LIST" },
+            ]
+          : [{ type: "Products", id: "LIST" }],
+    }),
+    getProductById: build.query<Product, string>({
+      query: (id) => `/products/${id}`,
+      providesTags: (result, error, id) => [{ type: "Products", id }],
     }),
     createProduct: build.mutation<Product, NewProduct>({
       query: (newProduct) => ({
@@ -80,7 +100,24 @@ export const api = createApi({
         method: "POST",
         body: newProduct,
       }),
-      invalidatesTags: ["Products"],
+      invalidatesTags: [{ type: "Products", id: "LIST" }],
+    }),
+    updateProduct: build.mutation<Product, UpdateProduct>({
+      query: ({ productId, ...patch }) => ({
+        url: `/products/${productId}`,
+        method: "PUT",
+        body: patch,
+      }),
+      invalidatesTags: (result, error, { productId }) => [
+        { type: "Products", id: productId },
+      ],
+    }),
+    deleteProduct: build.mutation<{ success: boolean; id: string }, string>({
+      query: (productId) => ({
+        url: `/products/${productId}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: (result, error, id) => [{ type: "Products", id }],
     }),
     getUsers: build.query<User[], void>({
       query: () => "/users",
@@ -96,7 +133,10 @@ export const api = createApi({
 export const {
   useGetDashboardMetricsQuery,
   useGetProductsQuery,
+  useGetProductByIdQuery,
   useCreateProductMutation,
+  useUpdateProductMutation,
+  useDeleteProductMutation,
   useGetUsersQuery,
   useGetExpensesByCategoryQuery,
 } = api;
