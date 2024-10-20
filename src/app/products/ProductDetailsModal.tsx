@@ -3,6 +3,8 @@ import React from "react";
 import { useGetProductByIdQuery } from "@/state/api";
 import Header from "@/app/(components)/Header";
 import Rating from "@/app/(components)/Rating";
+import { CldImage } from "next-cloudinary";
+import Image from "next/image";
 
 type ProductDetailsModalProps = {
   isOpen: boolean;
@@ -20,7 +22,7 @@ const ProductDetailsModal = ({
     isLoading,
     isError,
   } = useGetProductByIdQuery(productId);
-
+  const [imageError, setImageError] = React.useState(false);
   if (!isOpen) return null;
 
   if (isLoading) {
@@ -46,6 +48,28 @@ const ProductDetailsModal = ({
       <div className="relative top-10 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
         <Header name="Product Details" />
         <div className="mt-5">
+          {/* IMAGE */}
+          <div className="flex justify-center">
+            {!imageError ? (
+              <CldImage
+                src={product.productId}
+                alt={product.name}
+                width={300}
+                height={300}
+                crop="fill"
+                gravity="auto"
+                onError={() => setImageError(true)}
+              />
+            ) : (
+              <Image
+                src="https://res.cloudinary.com/alexnear/image/upload/v1728256364/no_image_product.png"
+                alt="Imagen no disponible"
+                width={300}
+                height={300}
+              />
+            )}
+          </div>
+
           {/* PRODUCT NAME */}
           <h3 className="text-lg font-semibold">{product.name}</h3>
 

@@ -1,8 +1,11 @@
 import React, { ChangeEvent, FormEvent, useState } from "react";
 import { v4 } from "uuid";
 import Header from "@/app/(components)/Header";
+import ImageUpload from "../(components)/ImageUpload";
+import Image from "next/image";
 
 type ProductFormData = {
+  productId: string;
   name: string;
   price: number;
   stockQuantity: number;
@@ -20,13 +23,23 @@ const CreateProductModal = ({
   onClose,
   onCreate,
 }: CreateProductModalProps) => {
+  // Generar productId solo una vez y usarlo en todo el componente
+  const [productId] = useState<string>(v4());
+
+  // Incluir el mismo productId en el formData
   const [formData, setFormData] = useState({
-    productId: v4(),
+    productId: productId,
     name: "",
     price: 0,
     stockQuantity: 0,
     rating: 0,
   });
+
+  const [imageUrl, setImageUrl] = useState<string>("");
+
+  const handleImageUpload = (url: string) => {
+    setImageUrl(url);
+  };
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -41,11 +54,11 @@ const CreateProductModal = ({
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    onCreate(formData);
+    onCreate(formData); // Enviar el productId correcto junto con el formData
     onClose();
     // Restablecer el formulario
     setFormData({
-      productId: "",
+      productId: v4(), // Generar nuevo productId para el siguiente producto
       name: "",
       price: 0,
       stockQuantity: 0,
@@ -118,6 +131,22 @@ const CreateProductModal = ({
             value={formData.rating}
             className={inputCssStyles}
           />
+
+          {/* Componente de carga de imagen */}
+          <ImageUpload
+            onUpload={handleImageUpload}
+            productId={formData.productId}
+          />
+
+          {/* Mostrar vista previa de la imagen si se ha cargado */}
+          {imageUrl && (
+            <Image
+              src={imageUrl}
+              alt="Imagen cargada"
+              width={200}
+              height={200}
+            />
+          )}
 
           {/* CREATE ACTIONS */}
           <button

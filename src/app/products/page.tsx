@@ -5,18 +5,13 @@ import {
   useDeleteProductMutation,
   useGetProductsQuery,
 } from "@/state/api";
-import {
-  PlusCircleIcon,
-  SearchIcon,
-  Edit2Icon,
-  Trash2Icon,
-} from "lucide-react";
+import { PlusCircleIcon, SearchIcon } from "lucide-react";
 import { useState } from "react";
 import Header from "@/app/(components)/Header";
-import Rating from "@/app/(components)/Rating";
 import CreateProductModal from "./CreateProductModal";
 import UpdateProductModal from "./UpdateProductModal";
 import ProductDetailsModal from "./ProductDetailsModal";
+import ProductItem from "./ProductItem";
 
 type ProductFormData = {
   productId?: string;
@@ -98,54 +93,19 @@ const Products = () => {
       {/* BODY PRODUCTS LIST */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10 justify-between">
         {products.map((product) => (
-          <div
+          <ProductItem
             key={product.productId}
-            className="border shadow rounded-md p-4 max-w-full w-full mx-auto"
-          >
-            <div className="flex flex-col items-center">
-              {/* Placeholder para la imagen */}
-              <div>img</div>
-              <h3 className="text-lg text-gray-900 font-semibold">
-                {product.name}
-              </h3>
-              <p className="text-gray-800">${product.price.toFixed(2)}</p>
-              <div className="text-sm text-gray-600 mt-1">
-                Stock: {product.stockQuantity}
-              </div>
-              {product.rating && (
-                <div className="flex items-center mt-2">
-                  <Rating rating={product.rating} />
-                </div>
-              )}
-              {/* Botones de acciones */}
-              <div className="flex mt-4 space-x-2">
-                <button
-                  onClick={() => {
-                    setSelectedProductId(product.productId);
-                    setIsDetailsModalOpen(true);
-                  }}
-                  className="px-2 py-1 bg-green-500 text-white rounded hover:bg-green-700"
-                >
-                  View
-                </button>
-                <button
-                  onClick={() => {
-                    setSelectedProductId(product.productId);
-                    setIsUpdateModalOpen(true);
-                  }}
-                  className="px-2 py-1 bg-yellow-500 text-white rounded hover:bg-yellow-700"
-                >
-                  <Edit2Icon className="w-4 h-4" />
-                </button>
-                <button
-                  onClick={() => handleDeleteProduct(product.productId)}
-                  className="px-2 py-1 bg-red-500 text-white rounded hover:bg-red-700"
-                >
-                  <Trash2Icon className="w-4 h-4" />
-                </button>
-              </div>
-            </div>
-          </div>
+            product={product}
+            onDelete={handleDeleteProduct}
+            onViewDetails={(productId: string) => {
+              setSelectedProductId(productId);
+              setIsDetailsModalOpen(true);
+            }}
+            onUpdate={(productId: string) => {
+              setSelectedProductId(productId);
+              setIsUpdateModalOpen(true);
+            }}
+          />
         ))}
       </div>
 
