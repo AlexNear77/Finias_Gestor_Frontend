@@ -17,12 +17,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ onUpload, productId }) => {
       signatureEndpoint={`${process.env.NEXT_PUBLIC_API_BASE_URL}/cloudinary/sign-cloudinary-params`}
       options={{
         publicId: productId,
-        /* prepareUploadParams: (params: any) => {
-          return {
-            ...params,
-            public_id: productId,
-          };
-        }, */
+        clientAllowedFormats: ["png", "jpeg", "jpg"],
       }}
       onSuccess={(result: any) => {
         const url = result.info.secure_url;

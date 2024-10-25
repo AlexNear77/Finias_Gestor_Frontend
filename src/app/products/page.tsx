@@ -19,10 +19,13 @@ type ProductFormData = {
   price: number;
   stockQuantity: number;
   rating: number;
-  // slug
-  // description
-  // size
-  // gender
+  description?: string;
+  gender?: string;
+  sizes?: {
+    size: string;
+    stockQuantity: number;
+  }[];
+  imageUrl?: string;
 };
 
 const Products = () => {
@@ -136,15 +139,3 @@ const Products = () => {
 };
 
 export default Products;
-
-{
-  /* <Image
-                  src={`https://s3-inventorymanagement.s3.us-east-2.amazonaws.com/product${
-                    Math.floor(Math.random() * 3) + 1
-                  }.png`}
-                  alt={product.name}
-                  width={150}
-                  height={150}
-                  className="mb-3 rounded-2xl w-36 h-36"
-                /> */
-}

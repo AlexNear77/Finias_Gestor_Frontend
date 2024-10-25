@@ -1,12 +1,24 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
+export interface ProductSize {
+  id?: string;
+  size: string;
+  stockQuantity: number;
+  productId?: string;
+}
+
 export interface Product {
+  imageUrl: string;
   productId: string;
   name: string;
   price: number;
   rating?: number;
   stockQuantity: number;
+  description?: string;
+  gender?: string;
+  createdAt: string;
+  sizes?: ProductSize[];
 }
 
 export interface NewProduct {
@@ -14,6 +26,12 @@ export interface NewProduct {
   price: number;
   rating?: number;
   stockQuantity: number;
+  description?: string;
+  gender?: string;
+  sizes?: {
+    size: string;
+    stockQuantity: number;
+  }[];
 }
 
 export interface UpdateProduct {
@@ -22,6 +40,13 @@ export interface UpdateProduct {
   price?: number;
   rating?: number;
   stockQuantity?: number;
+  description?: string;
+  gender?: string;
+  sizes?: {
+    size: string;
+    stockQuantity: number;
+  }[];
+  imageUrl?: string;
 }
 
 export interface SalesSummary {

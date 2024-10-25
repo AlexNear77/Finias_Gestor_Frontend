@@ -23,6 +23,7 @@ const ProductDetailsModal = ({
     isError,
   } = useGetProductByIdQuery(productId);
   const [imageError, setImageError] = React.useState(false);
+
   if (!isOpen) return null;
 
   if (isLoading) {
@@ -76,8 +77,28 @@ const ProductDetailsModal = ({
           {/* PRICE */}
           <p className="mt-2">Price: ${product.price.toFixed(2)}</p>
 
+          {/* DESCRIPTION */}
+          {product.description && <p className="mt-2">{product.description}</p>}
+
+          {/* GENDER */}
+          {product.gender && <p className="mt-2">Gender: {product.gender}</p>}
+
           {/* STOCK QUANTITY */}
           <p>Stock Quantity: {product.stockQuantity}</p>
+
+          {/* SIZES */}
+          {product.sizes && product.sizes.length > 0 && (
+            <div className="mt-2">
+              <p className="font-semibold">Available Sizes:</p>
+              <ul className="list-disc list-inside">
+                {product.sizes.map((size) => (
+                  <li key={size.id}>
+                    Size {size.size}: {size.stockQuantity} in stock
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
 
           {/* RATING */}
           {product.rating && (
@@ -85,9 +106,6 @@ const ProductDetailsModal = ({
               <Rating rating={product.rating} />
             </div>
           )}
-
-          {/* Placeholder para relaciones */}
-          {/* Puedes mostrar información adicional si tus modelos incluyen más detalles */}
 
           {/* CLOSE ACTION */}
           <button

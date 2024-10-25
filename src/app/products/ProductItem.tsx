@@ -30,16 +30,31 @@ const ProductItem = ({ product, onDelete, onViewDetails, onUpdate }: any) => {
             height={300}
           />
         )}
-        <h3 className="text-lg text-gray-900 font-semibold">{product.name}</h3>
-        <p className="text-gray-800">${product.price.toFixed(2)}</p>
+        <h3 className="text-lg text-gray-900 font-semibold mt-2">
+          {product.name}
+        </h3>
+
+        {/* PRECIO */}
+        <p className="text-gray-800 mt-2">${product.price.toFixed(2)}</p>
+
+        {/* GÉNERO */}
+        {product.gender && (
+          <p className="text-sm text-gray-600 mt-1">Gender: {product.gender}</p>
+        )}
+
+        {/* STOCK */}
         <div className="text-sm text-gray-600 mt-1">
           Stock: {product.stockQuantity}
         </div>
+
+        {/* RATING */}
         {product.rating && (
           <div className="flex items-center mt-2">
             <Rating rating={product.rating} />
           </div>
         )}
+
+        {/* BOTONES DE ACCIÓN */}
         <div className="flex mt-4 space-x-2">
           <button
             onClick={() => onViewDetails(product.productId)}
