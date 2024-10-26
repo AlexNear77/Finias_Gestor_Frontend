@@ -1,12 +1,25 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 // ProductItem.tsx
-import { useState } from "react";
+import React, { useState } from "react";
 import { CldImage } from "next-cloudinary";
 import Image from "next/image";
-import { Edit2Icon, Trash2Icon } from "lucide-react";
-import Rating from "@/app/(components)/Rating";
+import { Edit2Icon, Trash2Icon, QrCodeIcon } from "lucide-react";
 
-const ProductItem = ({ product, onDelete, onViewDetails, onUpdate }: any) => {
+interface ProductItemProps {
+  product: any;
+  onDelete: (productId: string) => void;
+  onViewDetails: (productId: string) => void;
+  onUpdate: (productId: string) => void;
+  onGenerateQr: (productId: string) => void;
+}
+
+const ProductItem: React.FC<ProductItemProps> = ({
+  product,
+  onDelete,
+  onViewDetails,
+  onUpdate,
+  onGenerateQr,
+}) => {
   const [imageError, setImageError] = useState(false);
 
   return (
@@ -30,49 +43,34 @@ const ProductItem = ({ product, onDelete, onViewDetails, onUpdate }: any) => {
             height={300}
           />
         )}
-        <h3 className="text-lg text-gray-900 font-semibold mt-2">
-          {product.name}
-        </h3>
-
-        {/* PRECIO */}
-        <p className="text-gray-800 mt-2">${product.price.toFixed(2)}</p>
-
-        {/* GÉNERO */}
-        {product.gender && (
-          <p className="text-sm text-gray-600 mt-1">Gender: {product.gender}</p>
-        )}
-
-        {/* STOCK */}
-        <div className="text-sm text-gray-600 mt-1">
-          Stock: {product.stockQuantity}
-        </div>
-
-        {/* RATING */}
-        {product.rating && (
-          <div className="flex items-center mt-2">
-            <Rating rating={product.rating} />
-          </div>
-        )}
-
-        {/* BOTONES DE ACCIÓN */}
+        <h2 className="mt-2 text-xl font-semibold">{product.name}</h2>
+        <p className="mt-1 text-gray-600">${product.price.toFixed(2)}</p>
         <div className="flex mt-4 space-x-2">
           <button
             onClick={() => onViewDetails(product.productId)}
-            className="px-2 py-1 bg-green-500 text-white rounded hover:bg-green-700"
+            className="flex items-center px-2 py-1 bg-blue-500 text-white rounded hover:bg-blue-700"
           >
-            View
+            Details
           </button>
           <button
             onClick={() => onUpdate(product.productId)}
-            className="px-2 py-1 bg-yellow-500 text-white rounded hover:bg-yellow-700"
+            className="flex items-center px-2 py-1 bg-yellow-500 text-white rounded hover:bg-yellow-700"
           >
-            <Edit2Icon className="w-4 h-4" />
+            <Edit2Icon className="w-4 h-4 mr-1" />
+            Update
           </button>
           <button
             onClick={() => onDelete(product.productId)}
-            className="px-2 py-1 bg-red-500 text-white rounded hover:bg-red-700"
+            className="flex items-center px-2 py-1 bg-red-500 text-white rounded hover:bg-red-700"
           >
-            <Trash2Icon className="w-4 h-4" />
+            <Trash2Icon className="w-4 h-4 mr-1" />
+            Delete
+          </button>
+          <button
+            onClick={() => onGenerateQr(product.productId)}
+            className="flex items-center px-2 py-1 bg-green-500 text-white rounded hover:bg-green-700"
+          >
+            <QrCodeIcon className="w-4 h-4 " />
           </button>
         </div>
       </div>

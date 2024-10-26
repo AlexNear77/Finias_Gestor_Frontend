@@ -12,6 +12,8 @@ import Header from "@/app/(components)/Header";
 import CreateProductModal from "./CreateProductModal";
 import UpdateProductModal from "./UpdateProductModal";
 import ProductDetailsModal from "./ProductDetailsModal";
+import QrModal from "@/app/(components)/QrModal";
+
 import ProductItem from "./ProductItem";
 
 type ProductFormData = {
@@ -34,6 +36,7 @@ const Products = () => {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
+  const [isQrModalOpen, setIsQrModalOpen] = useState(false);
   const [selectedProductId, setSelectedProductId] = useState<string | null>(
     null
   );
@@ -59,6 +62,11 @@ const Products = () => {
       await deleteProduct(productId);
       setIsDetailsModalOpen(false);
     }
+  };
+
+  const handleOpenQrModal = (productId: string) => {
+    setSelectedProductId(productId);
+    setIsQrModalOpen(true);
   };
 
   if (isLoading) {
@@ -115,6 +123,9 @@ const Products = () => {
               setSelectedProductId(productId);
               setIsUpdateModalOpen(true);
             }}
+            onGenerateQr={(productId: string) => {
+              handleOpenQrModal(productId);
+            }}
           />
         ))}
       </div>
@@ -145,6 +156,14 @@ const Products = () => {
             setIsUpdateModalOpen(true);
             setIsDetailsModalOpen(false); // Cerrar el modal de detalles
           }}
+        />
+      )}
+
+      {selectedProductId && (
+        <QrModal
+          isOpen={isQrModalOpen}
+          onClose={() => setIsQrModalOpen(false)}
+          productId={selectedProductId}
         />
       )}
     </div>
