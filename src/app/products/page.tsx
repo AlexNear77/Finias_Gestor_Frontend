@@ -156,6 +156,10 @@ const Products = () => {
             setIsUpdateModalOpen(true);
             setIsDetailsModalOpen(false); // Cerrar el modal de detalles
           }}
+          onGenerateQr={(productId: string) => {
+            handleOpenQrModal(productId);
+            setIsDetailsModalOpen(false); // Opcional: cerrar el modal de detalles
+          }}
         />
       )}
 

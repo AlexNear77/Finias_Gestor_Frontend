@@ -5,7 +5,7 @@ import Header from "@/app/(components)/Header";
 import Rating from "@/app/(components)/Rating";
 import { CldImage } from "next-cloudinary";
 import Image from "next/image";
-import { Edit2Icon, Trash2Icon } from "lucide-react";
+import { Edit2Icon, Trash2Icon, QrCodeIcon } from "lucide-react";
 
 type ProductDetailsModalProps = {
   isOpen: boolean;
@@ -13,6 +13,7 @@ type ProductDetailsModalProps = {
   productId: string;
   onDelete: (productId: string) => void;
   onUpdate: (productId: string) => void;
+  onGenerateQr: (productId: string) => void;
 };
 
 const ProductDetailsModal = ({
@@ -21,6 +22,7 @@ const ProductDetailsModal = ({
   productId,
   onDelete,
   onUpdate,
+  onGenerateQr,
 }: ProductDetailsModalProps) => {
   const {
     data: product,
@@ -127,6 +129,13 @@ const ProductDetailsModal = ({
             >
               <Trash2Icon className="w-4 h-4 mr-1" />
               Delete
+            </button>
+            <button
+              onClick={() => onGenerateQr(product.productId)}
+              className="flex items-center px-2 py-1 bg-green-500 text-white rounded hover:bg-green-700"
+            >
+              <QrCodeIcon className="w-4 h-4 mr-1" />
+              QR Code
             </button>
             <button
               onClick={onClose}
