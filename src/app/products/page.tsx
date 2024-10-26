@@ -1,3 +1,4 @@
+// page.tsx
 "use client";
 
 import {
@@ -51,7 +52,13 @@ const Products = () => {
   };
 
   const handleDeleteProduct = async (productId: string) => {
-    await deleteProduct(productId);
+    const confirmDelete = window.confirm(
+      "Are you sure you want to delete this product?"
+    );
+    if (confirmDelete) {
+      await deleteProduct(productId);
+      setIsDetailsModalOpen(false);
+    }
   };
 
   if (isLoading) {
@@ -132,6 +139,12 @@ const Products = () => {
           isOpen={isDetailsModalOpen}
           onClose={() => setIsDetailsModalOpen(false)}
           productId={selectedProductId}
+          onDelete={handleDeleteProduct}
+          onUpdate={(productId: string) => {
+            setSelectedProductId(productId);
+            setIsUpdateModalOpen(true);
+            setIsDetailsModalOpen(false); // Cerrar el modal de detalles
+          }}
         />
       )}
     </div>

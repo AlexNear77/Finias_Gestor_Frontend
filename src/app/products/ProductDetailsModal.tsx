@@ -5,17 +5,22 @@ import Header from "@/app/(components)/Header";
 import Rating from "@/app/(components)/Rating";
 import { CldImage } from "next-cloudinary";
 import Image from "next/image";
+import { Edit2Icon, Trash2Icon } from "lucide-react";
 
 type ProductDetailsModalProps = {
   isOpen: boolean;
   onClose: () => void;
   productId: string;
+  onDelete: (productId: string) => void;
+  onUpdate: (productId: string) => void;
 };
 
 const ProductDetailsModal = ({
   isOpen,
   onClose,
   productId,
+  onDelete,
+  onUpdate,
 }: ProductDetailsModalProps) => {
   const {
     data: product,
@@ -107,13 +112,29 @@ const ProductDetailsModal = ({
             </div>
           )}
 
-          {/* CLOSE ACTION */}
-          <button
-            onClick={onClose}
-            className="mt-4 px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-700"
-          >
-            Close
-          </button>
+          {/* ACTION BUTTONS */}
+          <div className="flex mt-4 space-x-2">
+            <button
+              onClick={() => onUpdate(product.productId)}
+              className="flex items-center px-2 py-1 bg-yellow-500 text-white rounded hover:bg-yellow-700"
+            >
+              <Edit2Icon className="w-4 h-4 mr-1" />
+              Update
+            </button>
+            <button
+              onClick={() => onDelete(product.productId)}
+              className="flex items-center px-2 py-1 bg-red-500 text-white rounded hover:bg-red-700"
+            >
+              <Trash2Icon className="w-4 h-4 mr-1" />
+              Delete
+            </button>
+            <button
+              onClick={onClose}
+              className="px-2 py-1 bg-gray-500 text-white rounded hover:bg-gray-700"
+            >
+              Close
+            </button>
+          </div>
         </div>
       </div>
     </div>
