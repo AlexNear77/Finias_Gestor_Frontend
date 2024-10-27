@@ -30,10 +30,8 @@ const CreateProductModal = ({
   onClose,
   onCreate,
 }: CreateProductModalProps) => {
-  // Generar productId solo una vez y usarlo en todo el componente
   const [productId] = useState<string>(v4());
 
-  // Incluir el mismo productId en el formData
   const [formData, setFormData] = useState<ProductFormData>({
     productId: productId,
     name: "",
@@ -42,16 +40,12 @@ const CreateProductModal = ({
     rating: 0,
     description: "",
     gender: "",
+    sizes: [],
     imageUrl: "",
   });
 
-  const [imageUrl, setImageUrl] = useState<string>("");
-  const [sizes, setSizes] = useState<{ size: string; stockQuantity: number }[]>(
-    []
-  );
-
   const handleImageUpload = (url: string) => {
-    setImageUrl(url);
+    setFormData((prevData) => ({ ...prevData, imageUrl: url }));
   };
 
   const handleChange = (
@@ -68,11 +62,17 @@ const CreateProductModal = ({
   };
 
   const addSize = () => {
-    setSizes([...sizes, { size: "", stockQuantity: 0 }]);
+    setFormData((prevData) => ({
+      ...prevData,
+      sizes: [...(prevData.sizes || []), { size: "", stockQuantity: 0 }],
+    }));
   };
 
   const removeSize = (index: number) => {
-    setSizes(sizes.filter((_, i) => i !== index));
+    setFormData((prevData) => ({
+      ...prevData,
+      sizes: prevData.sizes?.filter((_, i) => i !== index) || [],
+    }));
   };
 
   const handleSizeChange = (
@@ -80,15 +80,15 @@ const CreateProductModal = ({
     field: string,
     value: string | number
   ) => {
-    const updatedSizes = sizes.map((sizeItem, i) =>
+    const updatedSizes = (formData.sizes || []).map((sizeItem, i) =>
       i === index ? { ...sizeItem, [field]: value } : sizeItem
     );
-    setSizes(updatedSizes);
+    setFormData((prevData) => ({ ...prevData, sizes: updatedSizes }));
   };
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    onCreate({ ...formData, sizes, imageUrl });
+    onCreate(formData);
     onClose();
     // Restablecer el formulario
     setFormData({
@@ -99,10 +99,9 @@ const CreateProductModal = ({
       rating: 0,
       description: "",
       gender: "",
+      sizes: [],
       imageUrl: "",
     });
-    setSizes([]);
-    setImageUrl("");
   };
 
   if (!isOpen) return null;
@@ -130,7 +129,6 @@ const CreateProductModal = ({
           onSubmit={handleSubmit}
           className="px-6 py-4 overflow-y-auto max-h-[80vh]"
         >
-          {/* PRODUCT NAME */}
           <label htmlFor="productName" className={labelCssStyles}>
             Product Name
           </label>
@@ -144,7 +142,6 @@ const CreateProductModal = ({
             required
           />
 
-          {/* PRICE */}
           <label htmlFor="productPrice" className={labelCssStyles}>
             Price
           </label>
@@ -158,7 +155,6 @@ const CreateProductModal = ({
             required
           />
 
-          {/* STOCK QUANTITY */}
           <label htmlFor="stockQuantity" className={labelCssStyles}>
             Stock Quantity
           </label>
@@ -172,7 +168,6 @@ const CreateProductModal = ({
             required
           />
 
-          {/* RATING */}
           <label htmlFor="rating" className={labelCssStyles}>
             Rating
           </label>
@@ -185,7 +180,6 @@ const CreateProductModal = ({
             className={inputCssStyles}
           />
 
-          {/* DESCRIPTION */}
           <label htmlFor="description" className={labelCssStyles}>
             Description
           </label>
@@ -197,7 +191,6 @@ const CreateProductModal = ({
             className={`${inputCssStyles} h-24 resize-none`}
           ></textarea>
 
-          {/* GENDER */}
           <label htmlFor="gender" className={labelCssStyles}>
             Gender
           </label>
@@ -216,7 +209,7 @@ const CreateProductModal = ({
           {/* SIZES */}
           <div className="mt-4">
             <label className={labelCssStyles}>Sizes</label>
-            {sizes.map((sizeItem, index) => (
+            {formData.sizes?.map((sizeItem, index) => (
               <div key={index} className="flex items-center mb-2">
                 <input
                   type="text"
@@ -258,18 +251,17 @@ const CreateProductModal = ({
             </button>
           </div>
 
-          {/* Componente de carga de imagen */}
+          {/* Image Upload */}
           <div className="mt-4">
             <label className={labelCssStyles}>Product Image</label>
             <ImageUpload
               onUpload={handleImageUpload}
               productId={formData.productId}
             />
-            {/* Mostrar vista previa de la imagen si se ha cargado */}
-            {imageUrl && (
+            {formData.imageUrl && (
               <div className="mt-4">
                 <Image
-                  src={imageUrl}
+                  src={formData.imageUrl}
                   alt="Uploaded Image"
                   width={200}
                   height={200}
@@ -278,7 +270,7 @@ const CreateProductModal = ({
               </div>
             )}
           </div>
-          {/* Botones de acción */}
+
           <div className="px-6 py-4 border-t flex justify-end">
             <button
               type="button"

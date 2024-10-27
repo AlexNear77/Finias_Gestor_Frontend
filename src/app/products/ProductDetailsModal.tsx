@@ -61,8 +61,14 @@ export default function ProductDetailsModal({
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black bg-opacity-70">
-      <div className="relative mx-auto w-full max-w-2xl rounded-lg bg-white p-6 shadow-2xl">
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black bg-opacity-70"
+      onClick={onClose} // Detecta clics fuera del modal y cierra el modal
+    >
+      <div
+        className="relative mx-auto w-full max-w-2xl rounded-lg bg-white p-6 shadow-2xl"
+        onClick={(e) => e.stopPropagation()} // Evita que los clics dentro del modal lo cierren
+      >
         <button
           onClick={onClose}
           className="absolute right-4 top-4 text-gray-400 transition-colors hover:text-gray-600"

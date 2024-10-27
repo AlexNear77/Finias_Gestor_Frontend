@@ -1,9 +1,11 @@
-// UpdateProductModal.tsx
+"use client";
+
 import React, { ChangeEvent, FormEvent, useEffect, useState } from "react";
 import { useGetProductByIdQuery, useUpdateProductMutation } from "@/state/api";
 import Header from "@/app/(components)/Header";
 import ImageUpload from "../(components)/ImageUpload";
 import Image from "next/image";
+import { XIcon, PlusIcon, MinusIcon } from "lucide-react";
 
 type ProductFormData = {
   name: string;
@@ -25,11 +27,11 @@ type UpdateProductModalProps = {
   productId: string;
 };
 
-const UpdateProductModal = ({
+export default function UpdateProductModal({
   isOpen,
   onClose,
   productId,
-}: UpdateProductModalProps) => {
+}: UpdateProductModalProps) {
   const { data: product, isLoading } = useGetProductByIdQuery(productId);
   const [updateProduct] = useUpdateProductMutation();
   const [formData, setFormData] = useState<ProductFormData>({
@@ -111,109 +113,143 @@ const UpdateProductModal = ({
 
   if (isLoading) {
     return (
-      <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-20">
-        <div className="bg-white p-4 rounded">Loading...</div>
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+        <div className="rounded-lg bg-white p-6 shadow-xl">
+          <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent"></div>
+        </div>
       </div>
     );
   }
 
-  const labelCssStyles = "block text-sm font-medium text-gray-700";
-  const inputCssStyles =
-    "block w-full mb-2 p-2 border-gray-500 border-2 rounded-md";
-
   return (
-    <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-20">
-      <div className="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+    <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black bg-opacity-50">
+      <div className="relative mx-auto w-full max-w-2xl rounded-lg bg-white p-6 shadow-2xl">
+        <button
+          onClick={onClose}
+          className="absolute right-4 top-4 text-gray-400 transition-colors hover:text-gray-600"
+        >
+          <XIcon className="h-6 w-6" />
+        </button>
         <Header name="Update Product" />
-        <form onSubmit={handleSubmit} className="mt-5">
-          {/* PRODUCT NAME */}
-          <label htmlFor="productName" className={labelCssStyles}>
-            Product Name
-          </label>
-          <input
-            type="text"
-            name="name"
-            placeholder="Name"
-            onChange={handleChange}
-            value={formData.name}
-            className={inputCssStyles}
-            required
-          />
+        <form onSubmit={handleSubmit} className="mt-6 grid gap-6">
+          <div className="grid gap-2">
+            <label
+              htmlFor="productName"
+              className="text-sm font-medium text-gray-700"
+            >
+              Product Name
+            </label>
+            <input
+              type="text"
+              id="productName"
+              name="name"
+              placeholder="Name"
+              onChange={handleChange}
+              value={formData.name}
+              className="rounded-md border border-gray-300 p-2 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+              required
+            />
+          </div>
 
-          {/* PRICE */}
-          <label htmlFor="productPrice" className={labelCssStyles}>
-            Price
-          </label>
-          <input
-            type="number"
-            name="price"
-            placeholder="Price"
-            onChange={handleChange}
-            value={formData.price}
-            className={inputCssStyles}
-            required
-          />
+          <div className="grid grid-cols-2 gap-4">
+            <div className="grid gap-2">
+              <label
+                htmlFor="productPrice"
+                className="text-sm font-medium text-gray-700"
+              >
+                Price
+              </label>
+              <input
+                type="number"
+                id="productPrice"
+                name="price"
+                placeholder="Price"
+                onChange={handleChange}
+                value={formData.price}
+                className="rounded-md border border-gray-300 p-2 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+                required
+              />
+            </div>
+            <div className="grid gap-2">
+              <label
+                htmlFor="stockQuantity"
+                className="text-sm font-medium text-gray-700"
+              >
+                Stock Quantity
+              </label>
+              <input
+                type="number"
+                id="stockQuantity"
+                name="stockQuantity"
+                placeholder="Stock Quantity"
+                onChange={handleChange}
+                value={formData.stockQuantity}
+                className="rounded-md border border-gray-300 p-2 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+                required
+              />
+            </div>
+          </div>
 
-          {/* STOCK QUANTITY */}
-          <label htmlFor="stockQuantity" className={labelCssStyles}>
-            Stock Quantity
-          </label>
-          <input
-            type="number"
-            name="stockQuantity"
-            placeholder="Stock Quantity"
-            onChange={handleChange}
-            value={formData.stockQuantity}
-            className={inputCssStyles}
-            required
-          />
+          <div className="grid gap-2">
+            <label
+              htmlFor="rating"
+              className="text-sm font-medium text-gray-700"
+            >
+              Rating
+            </label>
+            <input
+              type="number"
+              id="rating"
+              name="rating"
+              placeholder="Rating"
+              onChange={handleChange}
+              value={formData.rating}
+              className="rounded-md border border-gray-300 p-2 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+            />
+          </div>
 
-          {/* RATING */}
-          <label htmlFor="rating" className={labelCssStyles}>
-            Rating
-          </label>
-          <input
-            type="number"
-            name="rating"
-            placeholder="Rating"
-            onChange={handleChange}
-            value={formData.rating}
-            className={inputCssStyles}
-          />
+          <div className="grid gap-2">
+            <label
+              htmlFor="description"
+              className="text-sm font-medium text-gray-700"
+            >
+              Description
+            </label>
+            <textarea
+              id="description"
+              name="description"
+              placeholder="Description"
+              onChange={handleChange}
+              value={formData.description}
+              className="h-24 resize-none rounded-md border border-gray-300 p-2 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+            ></textarea>
+          </div>
 
-          {/* DESCRIPTION */}
-          <label htmlFor="description" className={labelCssStyles}>
-            Description
-          </label>
-          <textarea
-            name="description"
-            placeholder="Description"
-            onChange={handleChange}
-            value={formData.description}
-            className={`${inputCssStyles} h-24 resize-none`}
-          ></textarea>
+          <div className="grid gap-2">
+            <label
+              htmlFor="gender"
+              className="text-sm font-medium text-gray-700"
+            >
+              Gender
+            </label>
+            <select
+              id="gender"
+              name="gender"
+              onChange={handleChange}
+              value={formData.gender}
+              className="rounded-md border border-gray-300 p-2 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+            >
+              <option value="">Select Gender</option>
+              <option value="Male">Male</option>
+              <option value="Female">Female</option>
+              <option value="Unisex">Unisex</option>
+            </select>
+          </div>
 
-          {/* GENDER */}
-          <label htmlFor="gender" className={labelCssStyles}>
-            Gender
-          </label>
-          <select
-            name="gender"
-            onChange={handleChange}
-            value={formData.gender}
-            className={inputCssStyles}
-          >
-            <option value="">Select Gender</option>
-            <option value="Male">Male</option>
-            <option value="Female">Female</option>
-            <option value="Unisex">Unisex</option>
-          </select>
-
-          {/* SIZES */}
-          <div className="mt-4">
-            <label className={labelCssStyles}>Sizes</label>
+          <div className="grid gap-2">
+            <label className="text-sm font-medium text-gray-700">Sizes</label>
             {sizes.map((sizeItem, index) => (
-              <div key={index} className="flex items-center mb-2">
+              <div key={index} className="flex items-center gap-2">
                 <input
                   type="text"
                   placeholder="Size"
@@ -221,7 +257,7 @@ const UpdateProductModal = ({
                   onChange={(e) =>
                     handleSizeChange(index, "size", e.target.value)
                   }
-                  className={`${inputCssStyles} mr-2`}
+                  className="flex-1 rounded-md border border-gray-300 p-2 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
                 />
                 <input
                   type="number"
@@ -234,62 +270,62 @@ const UpdateProductModal = ({
                       parseInt(e.target.value)
                     )
                   }
-                  className={`${inputCssStyles} mr-2`}
+                  className="flex-1 rounded-md border border-gray-300 p-2 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
                 />
                 <button
                   type="button"
                   onClick={() => removeSize(index)}
-                  className="text-red-500 hover:text-red-700"
+                  className="rounded-full bg-red-100 p-2 text-red-600 transition-colors hover:bg-red-200"
                 >
-                  Remove
+                  <MinusIcon className="h-4 w-4" />
                 </button>
               </div>
             ))}
             <button
               type="button"
               onClick={addSize}
-              className="mt-2 px-4 py-2 bg-green-500 text-white rounded hover:bg-green-700"
+              className="mt-2 flex items-center justify-center gap-2 rounded-md bg-green-500 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-green-600"
             >
+              <PlusIcon className="h-4 w-4" />
               Add Size
             </button>
           </div>
 
-          {/* IMAGE UPLOAD */}
-          <div className="mt-4">
-            <label className={labelCssStyles}>Product Image</label>
+          <div className="grid gap-2">
+            <label className="text-sm font-medium text-gray-700">
+              Product Image
+            </label>
             <ImageUpload onUpload={handleImageUpload} productId={productId} />
-            {/* Mostrar vista previa de la imagen si se ha cargado */}
             {imageUrl && (
-              <div className="mt-4">
+              <div className="mt-2">
                 <Image
                   src={imageUrl}
                   alt="Uploaded Image"
                   width={200}
                   height={200}
-                  className="rounded-md"
+                  className="rounded-md object-cover"
                 />
               </div>
             )}
           </div>
 
-          {/* UPDATE ACTIONS */}
-          <button
-            type="submit"
-            className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700"
-          >
-            Update
-          </button>
-          <button
-            onClick={onClose}
-            type="button"
-            className="ml-2 px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-700"
-          >
-            Cancel
-          </button>
+          <div className="flex justify-end gap-4">
+            <button
+              onClick={onClose}
+              type="button"
+              className="rounded-md bg-gray-100 px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-200"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              className="rounded-md bg-yellow-500 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-primary/90"
+            >
+              Update
+            </button>
+          </div>
         </form>
       </div>
     </div>
   );
-};
-
-export default UpdateProductModal;
+}
