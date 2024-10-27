@@ -6,13 +6,14 @@ import {
   useDeleteProductMutation,
   useGetProductsQuery,
 } from "@/state/api";
-import { PlusCircleIcon, SearchIcon } from "lucide-react";
+import { PlusCircleIcon, SearchIcon, QrCodeIcon } from "lucide-react";
 import { useState } from "react";
 import Header from "@/app/(components)/Header";
 import CreateProductModal from "./CreateProductModal";
 import UpdateProductModal from "./UpdateProductModal";
 import ProductDetailsModal from "./ProductDetailsModal";
 import QrModal from "@/app/(components)/QrModal";
+import QrScannerModal from "../(components)/QrScannerModal";
 
 import ProductItem from "./ProductItem";
 
@@ -40,6 +41,7 @@ const Products = () => {
   const [selectedProductId, setSelectedProductId] = useState<string | null>(
     null
   );
+  const [isQrScannerOpen, setIsQrScannerOpen] = useState(false);
 
   const {
     data: products,
@@ -67,6 +69,23 @@ const Products = () => {
   const handleOpenQrModal = (productId: string) => {
     setSelectedProductId(productId);
     setIsQrModalOpen(true);
+  };
+
+  const handleScanSuccess = (productId: string) => {
+    // Cierra el modal del escáner
+    setIsQrScannerOpen(false);
+
+    // Verifica si el producto existe
+    const productExists =
+      products?.some((product) => product.productId === productId) ?? false;
+
+    if (productExists) {
+      // Abre el modal de detalles del producto
+      setSelectedProductId(productId);
+      setIsDetailsModalOpen(true);
+    } else {
+      alert("Producto no encontrado.");
+    }
   };
 
   if (isLoading) {
@@ -99,17 +118,25 @@ const Products = () => {
       {/* HEADER BAR */}
       <div className="flex justify-between items-center mb-6">
         <Header name="Products" />
-        <button
-          className="flex items-center bg-blue-500 hover:bg-blue-700 text-gray-200 font-bold py-2 px-4 rounded"
-          onClick={() => setIsCreateModalOpen(true)}
-        >
-          <PlusCircleIcon className="w-5 h-5 mr-2 !text-gray-200" /> Create
-          Product
-        </button>
+        <div className="flex items-center">
+          <button
+            className="flex items-center bg-blue-500 hover:bg-blue-700 text-gray-200 font-bold py-2 px-4 rounded"
+            onClick={() => setIsCreateModalOpen(true)}
+          >
+            <PlusCircleIcon className="w-5 h-5 mr-2 !text-gray-200" /> Create
+            Product
+          </button>
+          <button
+            className="flex items-center bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded ml-2"
+            onClick={() => setIsQrScannerOpen(true)}
+          >
+            <QrCodeIcon className="w-5 h-5 mr-2" /> Escanear QR
+          </button>
+        </div>
       </div>
 
       {/* BODY PRODUCTS LIST */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10 justify-between">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 justify-between">
         {products.map((product) => (
           <ProductItem
             key={product.productId}
@@ -135,6 +162,12 @@ const Products = () => {
         isOpen={isCreateModalOpen}
         onClose={() => setIsCreateModalOpen(false)}
         onCreate={handleCreateProduct}
+      />
+
+      <QrScannerModal
+        isOpen={isQrScannerOpen}
+        onClose={() => setIsQrScannerOpen(false)}
+        onScanSuccess={handleScanSuccess}
       />
 
       {selectedProductId && (
