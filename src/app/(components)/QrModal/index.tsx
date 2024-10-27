@@ -43,8 +43,14 @@ const QrModal: React.FC<QrModalProps> = ({ isOpen, onClose, productId }) => {
   /* const productUrl = `https://tu-sitio.com/product/${productId}`;
    */
   return (
-    <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-30">
-      <div className="relative top-10 mx-auto p-5 border w-80 shadow-lg rounded-md bg-white print-container">
+    <div
+      className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-30"
+      onClick={onClose}
+    >
+      <div
+        className="relative top-10 mx-auto p-5 border w-80 shadow-lg rounded-md bg-white print-container"
+        onClick={(e) => e.stopPropagation()}
+      >
         <div className="flex justify-between items-center">
           <h2 className="text-xl font-semibold">Código QR</h2>
           <button

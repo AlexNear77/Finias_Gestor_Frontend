@@ -1,5 +1,3 @@
-"use client";
-
 import React, { ChangeEvent, FormEvent, useEffect, useState } from "react";
 import { useGetProductByIdQuery, useUpdateProductMutation } from "@/state/api";
 import Header from "@/app/(components)/Header";
@@ -34,6 +32,7 @@ export default function UpdateProductModal({
 }: UpdateProductModalProps) {
   const { data: product, isLoading } = useGetProductByIdQuery(productId);
   const [updateProduct] = useUpdateProductMutation();
+
   const [formData, setFormData] = useState<ProductFormData>({
     name: "",
     price: 0,
@@ -44,11 +43,6 @@ export default function UpdateProductModal({
     sizes: [],
     imageUrl: "",
   });
-
-  const [sizes, setSizes] = useState<{ size: string; stockQuantity: number }[]>(
-    []
-  );
-  const [imageUrl, setImageUrl] = useState<string>("");
 
   useEffect(() => {
     if (product) {
@@ -62,8 +56,6 @@ export default function UpdateProductModal({
         sizes: product.sizes || [],
         imageUrl: product.imageUrl || "",
       });
-      setSizes(product.sizes || []);
-      setImageUrl(product.imageUrl || "");
     }
   }, [product]);
 
@@ -81,11 +73,17 @@ export default function UpdateProductModal({
   };
 
   const addSize = () => {
-    setSizes([...sizes, { size: "", stockQuantity: 0 }]);
+    setFormData({
+      ...formData,
+      sizes: [...(formData.sizes || []), { size: "", stockQuantity: 0 }],
+    });
   };
 
   const removeSize = (index: number) => {
-    setSizes(sizes.filter((_, i) => i !== index));
+    setFormData({
+      ...formData,
+      sizes: formData.sizes?.filter((_, i) => i !== index) || [],
+    });
   };
 
   const handleSizeChange = (
@@ -93,19 +91,19 @@ export default function UpdateProductModal({
     field: string,
     value: string | number
   ) => {
-    const updatedSizes = sizes.map((sizeItem, i) =>
+    const updatedSizes = (formData.sizes || []).map((sizeItem, i) =>
       i === index ? { ...sizeItem, [field]: value } : sizeItem
     );
-    setSizes(updatedSizes);
+    setFormData({ ...formData, sizes: updatedSizes });
   };
 
   const handleImageUpload = (url: string) => {
-    setImageUrl(url);
+    setFormData((prevData) => ({ ...prevData, imageUrl: url }));
   };
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    await updateProduct({ productId, ...formData, sizes, imageUrl });
+    await updateProduct({ productId, ...formData });
     onClose();
   };
 
@@ -122,8 +120,14 @@ export default function UpdateProductModal({
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black bg-opacity-50">
-      <div className="relative mx-auto w-full max-w-2xl rounded-lg bg-white p-6 shadow-2xl">
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black bg-opacity-50"
+      onClick={onClose}
+    >
+      <div
+        className="relative mx-auto w-full max-w-2xl rounded-lg bg-white p-6 shadow-2xl"
+        onClick={(e) => e.stopPropagation()}
+      >
         <button
           onClick={onClose}
           className="absolute right-4 top-4 text-gray-400 transition-colors hover:text-gray-600"
@@ -248,7 +252,7 @@ export default function UpdateProductModal({
 
           <div className="grid gap-2">
             <label className="text-sm font-medium text-gray-700">Sizes</label>
-            {sizes.map((sizeItem, index) => (
+            {formData.sizes?.map((sizeItem, index) => (
               <div key={index} className="flex items-center gap-2">
                 <input
                   type="text"
@@ -296,10 +300,10 @@ export default function UpdateProductModal({
               Product Image
             </label>
             <ImageUpload onUpload={handleImageUpload} productId={productId} />
-            {imageUrl && (
+            {formData.imageUrl && (
               <div className="mt-2">
                 <Image
-                  src={imageUrl}
+                  src={formData.imageUrl}
                   alt="Uploaded Image"
                   width={200}
                   height={200}
