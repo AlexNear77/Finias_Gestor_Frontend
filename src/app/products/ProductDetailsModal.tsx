@@ -137,7 +137,8 @@ export default function ProductDetailsModal({
                   </div>
                 </div>
               )}
-              {product.rating && (
+
+              {product.rating !== undefined && product.rating > 0 && (
                 <div className="mt-4 flex items-center">
                   <Rating rating={product.rating} />
                   <span className="ml-2 text-sm text-gray-600">

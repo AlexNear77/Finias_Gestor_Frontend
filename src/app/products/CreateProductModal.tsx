@@ -180,6 +180,7 @@ const CreateProductModal = ({
           <input
             type="number"
             name="rating"
+            defaultValue={0}
             placeholder="Rating"
             onChange={handleChange}
             value={formData.rating}
