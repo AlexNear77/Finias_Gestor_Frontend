@@ -3,6 +3,7 @@
 import { useGetProductsQuery } from "@/state/api";
 import Header from "@/app/(components)/Header";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
+import { useState } from "react";
 
 const columns: GridColDef[] = [
   { field: "productId", headerName: "ID", width: 90 },
@@ -30,7 +31,15 @@ const columns: GridColDef[] = [
 ];
 
 const Inventory = () => {
-  const { data: products, isError, isLoading } = useGetProductsQuery();
+  const [page, setPage] = useState(0); // page index in MUI is zero-based
+  const pageSize = 16; // Número de productos por página
+  const { data, isError, isLoading } = useGetProductsQuery({
+    page: page + 1, // convert to 1-based index for the backend
+    limit: pageSize,
+  });
+
+  const products = data?.products || [];
+  const totalPages = data?.totalPages || 1;
 
   if (isLoading) {
     return <div className="py-4">Loading...</div>;
@@ -51,6 +60,11 @@ const Inventory = () => {
         rows={products}
         columns={columns}
         getRowId={(row) => row.productId}
+        pagination
+        paginationMode="server"
+        paginationModel={{ page, pageSize }} // Controla el modelo de paginación
+        rowCount={totalPages * pageSize} // Establece el número total de filas
+        onPaginationModelChange={(model) => setPage(model.page)} // Actualiza la página cuando cambia el modelo
         checkboxSelection
         className="bg-white shadow rounded-lg border border-gray-200 mt-5 !text-gray-700"
       />

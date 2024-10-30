@@ -99,15 +99,18 @@ export const api = createApi({
       query: () => "/dashboard",
       providesTags: ["DashboardMetrics"],
     }),
-    getProducts: build.query<Product[], string | void>({
-      query: (search) => ({
+    getProducts: build.query<
+      { products: Product[]; totalPages: number; currentPage: number },
+      { search?: string; page?: number; limit?: number }
+    >({
+      query: ({ search = "", page = 1, limit = 16 }) => ({
         url: "/products",
-        params: search ? { search } : {},
+        params: { search, page, limit },
       }),
       providesTags: (result) =>
         result
           ? [
-              ...result.map(
+              ...result.products.map(
                 ({ productId }) =>
                   ({ type: "Products", id: productId } as const)
               ),

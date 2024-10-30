@@ -1,4 +1,3 @@
-// page.tsx
 "use client";
 
 import {
@@ -14,7 +13,6 @@ import UpdateProductModal from "./UpdateProductModal";
 import ProductDetailsModal from "./ProductDetailsModal";
 import QrModal from "@/app/(components)/QrModal";
 import QrScannerModal from "../(components)/QrScannerModal";
-
 import ProductItem from "./ProductItem";
 
 type ProductFormData = {
@@ -34,6 +32,8 @@ type ProductFormData = {
 
 const Products = () => {
   const [searchTerm, setSearchTerm] = useState("");
+  const [page, setPage] = useState(1);
+  const limit = 16;
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
@@ -43,11 +43,14 @@ const Products = () => {
   );
   const [isQrScannerOpen, setIsQrScannerOpen] = useState(false);
 
-  const {
-    data: products,
-    isLoading,
-    isError,
-  } = useGetProductsQuery(searchTerm);
+  const { data, isLoading, isError } = useGetProductsQuery({
+    search: searchTerm,
+    page,
+    limit,
+  });
+
+  const products = data?.products || [];
+  const totalPages = data?.totalPages || 1;
 
   const [createProduct] = useCreateProductMutation();
   const [deleteProduct] = useDeleteProductMutation();
@@ -72,20 +75,22 @@ const Products = () => {
   };
 
   const handleScanSuccess = (productId: string) => {
-    // Cierra el modal del escáner
     setIsQrScannerOpen(false);
-
-    // Verifica si el producto existe
-    const productExists =
-      products?.some((product) => product.productId === productId) ?? false;
+    const productExists = products.some(
+      (product) => product.productId === productId
+    );
 
     if (productExists) {
-      // Abre el modal de detalles del producto
       setSelectedProductId(productId);
       setIsDetailsModalOpen(true);
     } else {
-      alert("Producto no encontrado.");
+      alert("Product not found.");
     }
+  };
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(e.target.value);
+    setPage(1); // Reinicia a la primera página al buscar
   };
 
   if (isLoading) {
@@ -110,7 +115,7 @@ const Products = () => {
             className="w-full py-2 px-4 rounded bg-white"
             placeholder="Search products..."
             value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            onChange={handleSearchChange}
           />
         </div>
       </div>
@@ -130,7 +135,7 @@ const Products = () => {
             className="flex items-center bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded ml-2"
             onClick={() => setIsQrScannerOpen(true)}
           >
-            <QrCodeIcon className="w-5 h-5 mr-2" /> Escanear QR
+            <QrCodeIcon className="w-5 h-5 mr-2" /> Scan QR
           </button>
         </div>
       </div>
@@ -155,6 +160,35 @@ const Products = () => {
             }}
           />
         ))}
+      </div>
+
+      {/* PAGINATION CONTROLS */}
+      <div className="flex justify-center mt-6">
+        <button
+          onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
+          disabled={page === 1}
+          className={`px-4 py-2 mx-2 rounded ${
+            page === 1
+              ? "bg-gray-300 cursor-not-allowed"
+              : "bg-blue-500 text-white"
+          }`}
+        >
+          Previous
+        </button>
+        <span className="px-4 py-2">
+          Page {page} of {totalPages}
+        </span>
+        <button
+          onClick={() => setPage((prev) => Math.min(prev + 1, totalPages))}
+          disabled={page === totalPages}
+          className={`px-4 py-2 mx-2 rounded ${
+            page === totalPages
+              ? "bg-gray-300 cursor-not-allowed"
+              : "bg-blue-500 text-white"
+          }`}
+        >
+          Next
+        </button>
       </div>
 
       {/* MODALES */}
@@ -187,11 +221,11 @@ const Products = () => {
           onUpdate={(productId: string) => {
             setSelectedProductId(productId);
             setIsUpdateModalOpen(true);
-            setIsDetailsModalOpen(false); // Cerrar el modal de detalles
+            setIsDetailsModalOpen(false); // Close the details modal
           }}
           onGenerateQr={(productId: string) => {
             handleOpenQrModal(productId);
-            setIsDetailsModalOpen(false); // Opcional: cerrar el modal de detalles
+            setIsDetailsModalOpen(false); // Optional: close the details modal
           }}
         />
       )}
