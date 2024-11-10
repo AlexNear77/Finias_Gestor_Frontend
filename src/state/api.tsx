@@ -8,6 +8,12 @@ export interface ProductSize {
   productId?: string;
 }
 
+export interface Branch {
+  branchId: string;
+  name: string;
+  location: string;
+}
+
 export interface Product {
   imageUrl: string;
   productId: string;
@@ -19,6 +25,8 @@ export interface Product {
   gender?: string;
   createdAt: string;
   sizes?: ProductSize[];
+  branchId?: string;
+  branch?: Branch;
 }
 
 export interface NewProduct {
@@ -32,6 +40,7 @@ export interface NewProduct {
     size: string;
     stockQuantity: number;
   }[];
+  branchId?: string;
 }
 
 export interface UpdateProduct {
@@ -93,7 +102,7 @@ export interface User {
 export const api = createApi({
   baseQuery: fetchBaseQuery({ baseUrl: process.env.NEXT_PUBLIC_API_BASE_URL }),
   reducerPath: "api",
-  tagTypes: ["DashboardMetrics", "Products", "Users", "Expenses"],
+  tagTypes: ["DashboardMetrics", "Products", "Users", "Expenses", "Branches"],
   endpoints: (build) => ({
     getDashboardMetrics: build.query<DashboardMetrics, void>({
       query: () => "/dashboard",
@@ -101,11 +110,11 @@ export const api = createApi({
     }),
     getProducts: build.query<
       { products: Product[]; totalPages: number; currentPage: number },
-      { search?: string; page?: number; limit?: number }
+      { search?: string; page?: number; limit?: number; branchId?: string }
     >({
-      query: ({ search = "", page = 1, limit = 16 }) => ({
+      query: ({ search = "", page = 1, limit = 16, branchId }) => ({
         url: "/products",
-        params: { search, page, limit },
+        params: { search, page, limit, branchId },
       }),
       providesTags: (result) =>
         result
@@ -147,6 +156,42 @@ export const api = createApi({
       }),
       invalidatesTags: (result, error, id) => [{ type: "Products", id }],
     }),
+    getBranches: build.query<Branch[], void>({
+      query: () => "/branches",
+      providesTags: ["Branches"],
+    }),
+    getBranchById: build.query<Branch, string>({
+      query: (id) => `/branches/${id}`,
+      providesTags: (result, error, id) => [{ type: "Branches", id }],
+    }),
+    createBranch: build.mutation<Branch, Partial<Branch>>({
+      query: (body) => ({
+        url: "/branches",
+        method: "POST",
+        body,
+      }),
+      invalidatesTags: ["Branches"],
+    }),
+    updateBranch: build.mutation<
+      Branch,
+      Partial<Branch> & Pick<Branch, "branchId">
+    >({
+      query: ({ branchId, ...patch }) => ({
+        url: `/branches/${branchId}`,
+        method: "PUT",
+        body: patch,
+      }),
+      invalidatesTags: (result, error, { branchId }) => [
+        { type: "Branches", id: branchId },
+      ],
+    }),
+    deleteBranch: build.mutation<{ success: boolean; id: string }, string>({
+      query: (branchId) => ({
+        url: `/branches/${branchId}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: (result, error, id) => [{ type: "Branches", id }],
+    }),
     getUsers: build.query<User[], void>({
       query: () => "/users",
       providesTags: ["Users"],
@@ -167,4 +212,9 @@ export const {
   useDeleteProductMutation,
   useGetUsersQuery,
   useGetExpensesByCategoryQuery,
+  useGetBranchesQuery,
+  useGetBranchByIdQuery,
+  useCreateBranchMutation,
+  useUpdateBranchMutation,
+  useDeleteBranchMutation,
 } = api;

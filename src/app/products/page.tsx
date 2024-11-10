@@ -14,6 +14,7 @@ import ProductDetailsModal from "./ProductDetailsModal";
 import QrModal from "@/app/(components)/QrModal";
 import QrScannerModal from "../(components)/QrScannerModal";
 import ProductItem from "./ProductItem";
+import BranchSelect from "../(components)/BranchSelect";
 
 type ProductFormData = {
   productId?: string;
@@ -41,12 +42,14 @@ const Products = () => {
   const [selectedProductId, setSelectedProductId] = useState<string | null>(
     null
   );
+  const [selectedBranchId, setSelectedBranchId] = useState<string>("");
   const [isQrScannerOpen, setIsQrScannerOpen] = useState(false);
 
   const { data, isLoading, isError } = useGetProductsQuery({
     search: searchTerm,
     page,
     limit,
+    branchId: selectedBranchId || undefined,
   });
 
   const products = data?.products || [];
@@ -72,6 +75,11 @@ const Products = () => {
   const handleOpenQrModal = (productId: string) => {
     setSelectedProductId(productId);
     setIsQrModalOpen(true);
+  };
+
+  const handleBranchChange = (value: string) => {
+    setSelectedBranchId(value);
+    setPage(1); // Reinicia a la primera página al cambiar de sucursal
   };
 
   const handleScanSuccess = (productId: string) => {
@@ -109,13 +117,19 @@ const Products = () => {
     <div className="mx-auto pb-5 w-full">
       {/* SEARCH BAR */}
       <div className="mb-6">
-        <div className="flex items-center border-2 border-gray-200 rounded">
-          <SearchIcon className="w-5 h-5 text-gray-500 m-2" />
-          <input
-            className="w-full py-2 px-4 rounded bg-white"
-            placeholder="Search products..."
-            value={searchTerm}
-            onChange={handleSearchChange}
+        <div className="flex items-center justify-between">
+          <div className="flex items-center border-2 border-gray-200 rounded">
+            <SearchIcon className="w-5 h-5 text-gray-500 m-2" />
+            <input
+              className="w-full py-2 px-4 rounded bg-white"
+              placeholder="Search products..."
+              value={searchTerm}
+              onChange={handleSearchChange}
+            />
+          </div>
+          <BranchSelect
+            value={selectedBranchId}
+            onChange={handleBranchChange}
           />
         </div>
       </div>

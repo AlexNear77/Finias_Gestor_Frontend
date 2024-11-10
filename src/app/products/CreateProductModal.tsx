@@ -2,6 +2,7 @@ import React, { ChangeEvent, FormEvent, useState } from "react";
 import { v4 } from "uuid";
 import Header from "@/app/(components)/Header";
 import ImageUpload from "../(components)/ImageUpload";
+import BranchSelect from "../(components)/BranchSelect";
 import Image from "next/image";
 
 type ProductFormData = {
@@ -17,6 +18,7 @@ type ProductFormData = {
     stockQuantity: number;
   }[];
   imageUrl?: string;
+  branchId?: string;
 };
 
 type CreateProductModalProps = {
@@ -31,6 +33,7 @@ const CreateProductModal = ({
   onCreate,
 }: CreateProductModalProps) => {
   const [productId] = useState<string>(v4());
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
   const [formData, setFormData] = useState<ProductFormData>({
     productId: productId,
@@ -42,6 +45,7 @@ const CreateProductModal = ({
     gender: "",
     sizes: [],
     imageUrl: "",
+    branchId: "",
   });
 
   const handleImageUpload = (url: string) => {
@@ -59,6 +63,10 @@ const CreateProductModal = ({
           ? parseFloat(value)
           : value,
     });
+  };
+
+  const handleBranchChange = (value: string) => {
+    setFormData((prevData) => ({ ...prevData, branchId: value }));
   };
 
   const addSize = () => {
@@ -86,8 +94,34 @@ const CreateProductModal = ({
     setFormData((prevData) => ({ ...prevData, sizes: updatedSizes }));
   };
 
+  // Validar el formulario
+  const validateForm = () => {
+    const newErrors: { [key: string]: string } = {};
+
+    // Validación de 'branchId'
+    if (!formData.branchId || formData.branchId.trim() === "") {
+      newErrors.branchId = "Branch is required.";
+    }
+
+    // validar rating
+    if (formData.rating < 0 || formData.rating > 5) {
+      newErrors.rating = "Rating must be between 0 and 5.";
+    }
+
+    // ... otras validaciones
+
+    setErrors(newErrors);
+
+    return Object.keys(newErrors).length === 0;
+  };
+
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
+    if (!validateForm()) {
+      return;
+    }
+
     onCreate(formData);
     onClose();
     // Restablecer el formulario
@@ -185,7 +219,12 @@ const CreateProductModal = ({
             onChange={handleChange}
             value={formData.rating}
             className={inputCssStyles}
+            min="0"
+            max="5"
           />
+          {errors.rating && (
+            <p className="text-red-500 text-sm">{errors.rating}</p>
+          )}
 
           <label htmlFor="description" className={labelCssStyles}>
             Description
@@ -212,6 +251,18 @@ const CreateProductModal = ({
             <option value="Female">Female</option>
             <option value="Unisex">Unisex</option>
           </select>
+
+          {/* Branch */}
+          <label htmlFor="branchId" className={labelCssStyles}>
+            Branch
+          </label>
+          <BranchSelect
+            value={formData.branchId || ""}
+            onChange={handleBranchChange}
+          />
+          {errors.branchId && (
+            <p className="text-red-500 text-sm">{errors.branchId}</p>
+          )}
 
           {/* SIZES */}
           <div className="mt-4">

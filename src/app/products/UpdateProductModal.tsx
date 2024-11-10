@@ -2,6 +2,7 @@ import React, { ChangeEvent, FormEvent, useEffect, useState } from "react";
 import { useGetProductByIdQuery, useUpdateProductMutation } from "@/state/api";
 import Header from "@/app/(components)/Header";
 import ImageUpload from "../(components)/ImageUpload";
+import BranchSelect from "../(components)/BranchSelect";
 import Image from "next/image";
 import { XIcon, PlusIcon, MinusIcon } from "lucide-react";
 
@@ -17,6 +18,7 @@ type ProductFormData = {
     stockQuantity: number;
   }[];
   imageUrl?: string;
+  branchId?: string;
 };
 
 type UpdateProductModalProps = {
@@ -32,6 +34,7 @@ export default function UpdateProductModal({
 }: UpdateProductModalProps) {
   const { data: product, isLoading } = useGetProductByIdQuery(productId);
   const [updateProduct] = useUpdateProductMutation();
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
   const [formData, setFormData] = useState<ProductFormData>({
     name: "",
@@ -55,6 +58,7 @@ export default function UpdateProductModal({
         gender: product.gender || "",
         sizes: product.sizes || [],
         imageUrl: product.imageUrl || "",
+        branchId: product?.branchId || "",
       });
     }
   }, [product]);
@@ -70,6 +74,10 @@ export default function UpdateProductModal({
           ? parseFloat(value)
           : value,
     });
+  };
+
+  const handleBranchChange = (value: string) => {
+    setFormData((prevData) => ({ ...prevData, branchId: value }));
   };
 
   const addSize = () => {
@@ -101,8 +109,32 @@ export default function UpdateProductModal({
     setFormData((prevData) => ({ ...prevData, imageUrl: url }));
   };
 
+  // Validar el formulario
+  const validateForm = () => {
+    const newErrors: { [key: string]: string } = {};
+
+    // Validación de 'branchId'
+    if (!formData.branchId || formData.branchId.trim() === "") {
+      newErrors.branchId = "Branch is required.";
+    }
+
+    // validar rating
+    if (formData.rating < 0 || formData.rating > 5) {
+      newErrors.rating = "Rating must be between 0 and 5.";
+    }
+
+    // ... otras validaciones
+
+    setErrors(newErrors);
+
+    return Object.keys(newErrors).length === 0;
+  };
+
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (!validateForm()) {
+      return;
+    }
     await updateProduct({ productId, ...formData });
     onClose();
   };
@@ -210,6 +242,9 @@ export default function UpdateProductModal({
               value={formData.rating}
               className="rounded-md border border-gray-300 p-2 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
             />
+            {errors.rating && (
+              <p className="text-red-500 text-sm">{errors.rating}</p>
+            )}
           </div>
 
           <div className="grid gap-2">
@@ -249,6 +284,20 @@ export default function UpdateProductModal({
               <option value="Unisex">Unisex</option>
             </select>
           </div>
+
+          <label
+            htmlFor="branchId"
+            className="text-sm font-medium text-gray-700"
+          >
+            Branch
+          </label>
+          <BranchSelect
+            value={formData.branchId || ""}
+            onChange={handleBranchChange}
+          />
+          {errors.branchId && (
+            <p className="text-red-500 text-sm">{errors.branchId}</p>
+          )}
 
           <div className="grid gap-2">
             <label className="text-sm font-medium text-gray-700">Sizes</label>

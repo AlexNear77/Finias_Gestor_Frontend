@@ -10,6 +10,7 @@ import {
   Menu,
   SlidersHorizontal,
   User,
+  MapPinHouseIcon,
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -135,6 +136,13 @@ const Sidebar = () => {
           href="/expenses"
           icon={CircleDollarSign}
           label="Expenses"
+          isCollapsed={isSidebarCollapsed}
+        />
+        {/* Branches */}
+        <SidebarLink
+          href="/branches"
+          icon={MapPinHouseIcon}
+          label="Branches"
           isCollapsed={isSidebarCollapsed}
         />
       </div>

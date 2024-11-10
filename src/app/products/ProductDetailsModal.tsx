@@ -117,6 +117,16 @@ export default function ProductDetailsModal({
                   Gender: {product.gender}
                 </p>
               )}
+              <div className="mt-4">
+                <h3 className="text-lg font-semibold">Branch Information</h3>
+                {product.branch ? (
+                  <p>
+                    {product.branch.name} - {product.branch.location}
+                  </p>
+                ) : (
+                  <p>No branch assigned.</p>
+                )}
+              </div>
               <p className="mt-2 text-sm font-medium text-gray-600">
                 Stock Quantity: {product.stockQuantity}
               </p>
