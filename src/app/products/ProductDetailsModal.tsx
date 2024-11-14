@@ -127,9 +127,7 @@ export default function ProductDetailsModal({
                   <p>No branch assigned.</p>
                 )}
               </div>
-              <p className="mt-2 text-sm font-medium text-gray-600">
-                Stock Quantity: {product.stockQuantity}
-              </p>
+
               {product.sizes && product.sizes.length > 0 && (
                 <div className="mt-4">
                   <p className="font-semibold text-gray-700">

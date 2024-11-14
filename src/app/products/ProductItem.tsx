@@ -55,9 +55,6 @@ const ProductItem: React.FC<ProductItemProps> = ({
           <p className="text-xl font-bold text-primary">
             Price: ${product.price.toFixed(2)}
           </p>
-          <span className="rounded-full bg-primary/10 px-2 py-1 text-sm font-medium text-primary">
-            Stock: {product.stockQuantity}
-          </span>
         </div>
       </div>
       <div className="absolute inset-y-0 right-0 flex flex-col translate-x-full items-center space-y-2 bg-gradient-to-l from-black to-transparent p-4 transition-all duration-300 group-hover:translate-x-0">

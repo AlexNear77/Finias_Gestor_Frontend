@@ -20,7 +20,6 @@ type ProductFormData = {
   productId?: string;
   name: string;
   price: number;
-  stockQuantity: number;
   rating: number;
   description?: string;
   gender?: string;
@@ -64,7 +63,7 @@ const Products = () => {
 
   const handleDeleteProduct = async (productId: string) => {
     const confirmDelete = window.confirm(
-      "Are you sure you want to delete this product?"
+      "Quieres eliminar este producto? Esta acción no se puede deshacer."
     );
     if (confirmDelete) {
       await deleteProduct(productId);

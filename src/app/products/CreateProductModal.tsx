@@ -9,7 +9,6 @@ type ProductFormData = {
   productId: string;
   name: string;
   price: number;
-  stockQuantity: number;
   rating: number;
   description?: string;
   gender?: string;
@@ -39,7 +38,6 @@ const CreateProductModal = ({
     productId: productId,
     name: "",
     price: 0,
-    stockQuantity: 0,
     rating: 0,
     description: "",
     gender: "",
@@ -58,10 +56,7 @@ const CreateProductModal = ({
     const { name, value } = e.target;
     setFormData({
       ...formData,
-      [name]:
-        name === "price" || name === "stockQuantity" || name === "rating"
-          ? parseFloat(value)
-          : value,
+      [name]: name === "price" || name === "rating" ? parseFloat(value) : value,
     });
   };
 
@@ -129,7 +124,6 @@ const CreateProductModal = ({
       productId: v4(),
       name: "",
       price: 0,
-      stockQuantity: 0,
       rating: 0,
       description: "",
       gender: "",
@@ -191,19 +185,6 @@ const CreateProductModal = ({
             placeholder="Price"
             onChange={handleChange}
             value={formData.price}
-            className={inputCssStyles}
-            required
-          />
-
-          <label htmlFor="stockQuantity" className={labelCssStyles}>
-            Stock Quantity
-          </label>
-          <input
-            type="number"
-            name="stockQuantity"
-            placeholder="Stock Quantity"
-            onChange={handleChange}
-            value={formData.stockQuantity}
             className={inputCssStyles}
             required
           />

@@ -9,7 +9,6 @@ import { XIcon, PlusIcon, MinusIcon } from "lucide-react";
 type ProductFormData = {
   name: string;
   price: number;
-  stockQuantity: number;
   rating: number;
   description?: string;
   gender?: string;
@@ -39,7 +38,6 @@ export default function UpdateProductModal({
   const [formData, setFormData] = useState<ProductFormData>({
     name: "",
     price: 0,
-    stockQuantity: 0,
     rating: 0,
     description: "",
     gender: "",
@@ -52,7 +50,6 @@ export default function UpdateProductModal({
       setFormData({
         name: product.name,
         price: product.price,
-        stockQuantity: product.stockQuantity,
         rating: product.rating || 0,
         description: product.description || "",
         gender: product.gender || "",
@@ -69,10 +66,7 @@ export default function UpdateProductModal({
     const { name, value } = e.target;
     setFormData({
       ...formData,
-      [name]:
-        name === "price" || name === "stockQuantity" || name === "rating"
-          ? parseFloat(value)
-          : value,
+      [name]: name === "price" || name === "rating" ? parseFloat(value) : value,
     });
   };
 
@@ -202,24 +196,6 @@ export default function UpdateProductModal({
                 placeholder="Price"
                 onChange={handleChange}
                 value={formData.price}
-                className="rounded-md border border-gray-300 p-2 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
-                required
-              />
-            </div>
-            <div className="grid gap-2">
-              <label
-                htmlFor="stockQuantity"
-                className="text-sm font-medium text-gray-700"
-              >
-                Stock Quantity
-              </label>
-              <input
-                type="number"
-                id="stockQuantity"
-                name="stockQuantity"
-                placeholder="Stock Quantity"
-                onChange={handleChange}
-                value={formData.stockQuantity}
                 className="rounded-md border border-gray-300 p-2 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
                 required
               />

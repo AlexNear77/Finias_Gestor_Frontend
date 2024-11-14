@@ -20,7 +20,6 @@ export interface Product {
   name: string;
   price: number;
   rating?: number;
-  stockQuantity: number;
   description?: string;
   gender?: string;
   createdAt: string;
@@ -33,7 +32,6 @@ export interface NewProduct {
   name: string;
   price: number;
   rating?: number;
-  stockQuantity: number;
   description?: string;
   gender?: string;
   sizes?: {
@@ -56,6 +54,38 @@ export interface UpdateProduct {
     stockQuantity: number;
   }[];
   imageUrl?: string;
+}
+
+export interface SaleItem {
+  id: string;
+  productId: string;
+  product: Product;
+  size: string;
+  quantity: number;
+  price: number;
+}
+
+export interface Sale {
+  saleId: string;
+  date: string;
+  totalAmount: number;
+  paymentMethod: PaymentMethod;
+  saleItems: SaleItem[];
+}
+
+export type PaymentMethod =
+  | "CASH"
+  | "CREDIT_CARD"
+  | "DEBIT_CARD"
+  | "MOBILE_PAYMENT";
+
+export interface CreateSaleRequest {
+  items: {
+    productId: string;
+    size: string;
+    quantity: number;
+  }[];
+  paymentMethod: PaymentMethod;
 }
 
 export interface SalesSummary {
@@ -102,11 +132,30 @@ export interface User {
 export const api = createApi({
   baseQuery: fetchBaseQuery({ baseUrl: process.env.NEXT_PUBLIC_API_BASE_URL }),
   reducerPath: "api",
-  tagTypes: ["DashboardMetrics", "Products", "Users", "Expenses", "Branches"],
+  tagTypes: [
+    "DashboardMetrics",
+    "Products",
+    "Users",
+    "Expenses",
+    "Branches",
+    "Sales",
+  ],
   endpoints: (build) => ({
     getDashboardMetrics: build.query<DashboardMetrics, void>({
       query: () => "/dashboard",
       providesTags: ["DashboardMetrics"],
+    }),
+    createSale: build.mutation<Sale, CreateSaleRequest>({
+      query: (body) => ({
+        url: "/sales",
+        method: "POST",
+        body,
+      }),
+      invalidatesTags: ["Products"], // Invalidamos los productos para actualizar el stock
+    }),
+    getSales: build.query<Sale[], void>({
+      query: () => "/sales",
+      providesTags: ["Sales"],
     }),
     getProducts: build.query<
       { products: Product[]; totalPages: number; currentPage: number },
@@ -147,6 +196,7 @@ export const api = createApi({
       }),
       invalidatesTags: (result, error, { productId }) => [
         { type: "Products", id: productId },
+        { type: "Products", id: "LIST" },
       ],
     }),
     deleteProduct: build.mutation<{ success: boolean; id: string }, string>({
@@ -217,4 +267,6 @@ export const {
   useCreateBranchMutation,
   useUpdateBranchMutation,
   useDeleteBranchMutation,
+  useCreateSaleMutation,
+  useGetSalesQuery,
 } = api;

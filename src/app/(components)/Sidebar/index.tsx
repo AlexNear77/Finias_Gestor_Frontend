@@ -4,7 +4,8 @@ import { setIsSidebarCollapsed } from "@/state";
 import {
   Archive,
   CircleDollarSign,
-  Clipboard,
+  /*  Clipboard, */
+  ShoppingBagIcon,
   Layout,
   LucideIcon,
   Menu,
@@ -109,15 +110,21 @@ const Sidebar = () => {
           isCollapsed={isSidebarCollapsed}
         />
         <SidebarLink
+          href="/sales"
+          icon={ShoppingBagIcon}
+          label="Sales"
+          isCollapsed={isSidebarCollapsed}
+        />
+        {/* <SidebarLink
           href="/inventory"
           icon={Archive}
           label="Inventory"
           isCollapsed={isSidebarCollapsed}
-        />
+        /> */}
         <SidebarLink
           href="/products"
-          icon={Clipboard}
-          label="Products"
+          icon={Archive}
+          label="Inventory"
           isCollapsed={isSidebarCollapsed}
         />
         <SidebarLink
@@ -146,6 +153,7 @@ const Sidebar = () => {
           isCollapsed={isSidebarCollapsed}
         />
       </div>
+
       {/* FOOTER */}
       <div className={`${isSidebarCollapsed ? "hidden" : "block"} mb-10 `}>
         <p className="text-center text-xs text-gray-500">
