@@ -62,11 +62,13 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
             <tbody>
               {saleItems.map((item, index) => (
                 <tr key={index} className="text-center">
-                  <td className="py-2">{item.product?.name}</td>
+                  <td className="py-2">
+                    {item.product?.name ?? item.productId}
+                  </td>
                   <td className="py-2">{item.size}</td>
                   <td className="py-2">{item.quantity}</td>
                   <td className="py-2">
-                    ${(item.product?.price ?? 0 * item.quantity).toFixed(2)}
+                    ${(item.product?.price ?? 0) * item.quantity}
                   </td>
                 </tr>
               ))}

@@ -55,6 +55,9 @@ const ProductItem: React.FC<ProductItemProps> = ({
           <p className="text-xl font-bold text-primary">
             Price: ${product.price.toFixed(2)}
           </p>
+          {product.branch && (
+            <p className="mt-1 text-gray-500">{product.branch.name}</p>
+          )}
         </div>
       </div>
       <div className="absolute inset-y-0 right-0 flex flex-col translate-x-full items-center space-y-2 bg-gradient-to-l from-black to-transparent p-4 transition-all duration-300 group-hover:translate-x-0">

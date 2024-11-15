@@ -1,4 +1,5 @@
 // components/BranchSelect.tsx
+
 import React from "react";
 import { useGetBranchesQuery } from "@/state/api";
 
@@ -24,7 +25,7 @@ const BranchSelect: React.FC<BranchSelectProps> = ({ value, onChange }) => {
       onChange={(e) => onChange(e.target.value)}
       className="block w-full mb-2 p-2 border-gray-300 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
     >
-      <option value="">Select Branch</option>
+      <option value="">Seleccione Sucursal</option>
       {branches.map((branch) => (
         <option key={branch.branchId} value={branch.branchId}>
           {branch.name} - {branch.location}
