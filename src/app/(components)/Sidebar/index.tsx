@@ -1,10 +1,10 @@
 "use client";
+import React, { useEffect, useRef } from "react";
 import { useAppDispatch, useAppSelector } from "@/app/redux";
 import { setIsSidebarCollapsed } from "@/state";
 import {
   Archive,
   CircleDollarSign,
-  /*  Clipboard, */
   ShoppingBagIcon,
   Layout,
   LucideIcon,
@@ -16,7 +16,6 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import React from "react";
 
 interface SidebarLinkProps {
   href: string;
@@ -42,13 +41,13 @@ const SidebarLink = ({
           isCollapsed ? "justify-center py-4" : "justify-start px-8 py-4"
         } hover:text-blue-500 hover:bg-blue-100 gap-3 transition-colors ${
           isActive ? "bg-blue-200 text-white" : ""
-        } `}
+        }`}
       >
         <Icon className="w-6 h-6 !text-gray-700" />
         <span
           className={`${
             isCollapsed ? "hidden" : "block"
-          } font-medium text-gray-700 `}
+          } font-medium text-gray-700`}
         >
           {label}
         </span>
@@ -62,17 +61,35 @@ const Sidebar = () => {
   const isSidebarCollapsed = useAppSelector(
     (state) => state.global.isSideBarCollapsed
   );
+  const sidebarRef = useRef<HTMLDivElement>(null);
 
   const toggleSidebar = () => {
     dispatch(setIsSidebarCollapsed(!isSidebarCollapsed));
   };
+
+  // Maneja el clic fuera del sidebar
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        sidebarRef.current &&
+        !sidebarRef.current.contains(event.target as Node)
+      ) {
+        dispatch(setIsSidebarCollapsed(true)); // Cierra el sidebar
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [dispatch]);
 
   const sidebarClass = `fixed flex flex-col ${
     isSidebarCollapsed ? "w-0 md:w-16" : "w-72 md:w-64"
   } bg-white transition-all duration-300 overflow-hidden h-full shadow-md z-40`;
 
   return (
-    <div className={sidebarClass}>
+    <div ref={sidebarRef} className={sidebarClass}>
       {/* LOGO */}
       <div
         className={`flex gap-3 justify-between md:justify-normal items-center pt-8 ${
@@ -87,7 +104,7 @@ const Sidebar = () => {
           className="rounded w-8"
         />
         <h1
-          className={` ${
+          className={`${
             isSidebarCollapsed ? "hidden" : "block"
           } font-extrabold text-2xl`}
         >
@@ -115,12 +132,6 @@ const Sidebar = () => {
           label="Sales"
           isCollapsed={isSidebarCollapsed}
         />
-        {/* <SidebarLink
-          href="/inventory"
-          icon={Archive}
-          label="Inventory"
-          isCollapsed={isSidebarCollapsed}
-        /> */}
         <SidebarLink
           href="/products"
           icon={Archive}
@@ -145,7 +156,6 @@ const Sidebar = () => {
           label="Expenses"
           isCollapsed={isSidebarCollapsed}
         />
-        {/* Branches */}
         <SidebarLink
           href="/branches"
           icon={MapPinHouseIcon}
@@ -155,7 +165,7 @@ const Sidebar = () => {
       </div>
 
       {/* FOOTER */}
-      <div className={`${isSidebarCollapsed ? "hidden" : "block"} mb-10 `}>
+      <div className={`${isSidebarCollapsed ? "hidden" : "block"} mb-10`}>
         <p className="text-center text-xs text-gray-500">
           &copy; 2024 Black&White
         </p>
