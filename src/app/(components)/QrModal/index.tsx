@@ -48,7 +48,7 @@ const QrModal: React.FC<QrModalProps> = ({ isOpen, onClose, productId }) => {
       onClick={onClose}
     >
       <div
-        className="relative top-10 mx-auto p-5 border w-80 shadow-lg rounded-md bg-white print-container"
+        className="relative top-10 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white print-container"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex justify-between items-center">
@@ -60,8 +60,8 @@ const QrModal: React.FC<QrModalProps> = ({ isOpen, onClose, productId }) => {
             &times;
           </button>
         </div>
-        <div className="mt-4 flex flex-col items-center" ref={contentRef}>
-          <QRCode value={productId} size={150} />{" "}
+        <div className="mt-4 flex flex-col items-center " ref={contentRef}>
+          <QRCode value={productId} size={300} />{" "}
           <p className="mt-2">{productId}</p>
         </div>
         <div className="mt-4 flex justify-end space-x-2">
